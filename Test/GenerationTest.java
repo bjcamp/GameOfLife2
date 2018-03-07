@@ -65,18 +65,17 @@ public class GenerationTest extends Canvas{
     // Initialize next generation map
     int[][] nextGeneration = new int[numOfCells][numOfCells];
 
-    // Initializing neighborCount variable to keep track of cell neighbors
-    int neighborCount;
+    // Initializing neighborCount map
+    int[][] neighborCountMap = countNeighbors(currentGeneration);
 
     // Next generation logic (Base game logic)
     for(int i=0; i<numOfCells; i++) {
       for(int j=0; j<numOfCells; j++) {
-        neighborCount = countNeighbors(currentGeneration);
 
-        if(currentGeneration[i][j]==0 && neighborCount==3) { // Dead cell
+        if(currentGeneration[i][j]==0 && neighborCountMap[i][j]==3) { // Dead cell
           nextGeneration[i][j] = 1
         } else if(currentGeneration[i][j]==1) { // Live cell
-          if(neighborCount<2 || neighborCount>3){
+          if(neighborCountMap[i][j]<2 || neighborCountMap[i][j]>3){
             nextGeneration[i][j] = 0
           }
         }
@@ -84,10 +83,73 @@ public class GenerationTest extends Canvas{
     }
 
     return nextGeneration;
+  }
 
+  // Create function that will return the total number of living neighbors
+  public static int countNeighbors(int[][] currentGeneration){
 
+    // Initialize neighborCountMap to hold number of neighbors for each cell
+    int[][] neighborCountMap = new int[numOfCells][numOfCells];
+    int neighborCount;
 
+    // Perform count considering periodic boundary conditions
+    for(int i=0; i<numOfCells; i++) {
+      for(int j=0; j<numOfCells; j++) {
 
+        // Set neighborCount to zero for each cell iteration
+        neighborCount = 0;
+
+        // Consider periodic boundary conditions
+        int a = i - 1;
+        int b = i + 1;
+        int c = j - 1;
+        int d = j + 1;
+
+        if(a<0){
+          a += numOfCells;
+        }
+        if(b>0) {
+          b -= numOfCells;
+        }
+        if(c<0){
+          c += numOfCells;
+        }
+        if(d>0){
+          d -= numOfCells;
+        }
+
+        // Check neighbors and add to neighborCount if live
+        if(currentGeneration[a][c]==1){ // Top left
+          neighborCount += 1;
+        }
+        if(currentGeneration[a][j]==1){ // Top center
+          neighborCount += 1;
+        }
+        if(currentGeneration[a][d]==1){ // Top right
+          neighborCount += 1;
+        }
+        if(currentGeneration[i][c]==1){ // Middle left
+          neighborCount += 1;
+        }
+        if(currentGeneration[i][d]==1){ // Middle right
+          neighborCount += 1;
+        }
+        if(currentGeneration[b][c]==1){ // Bottom left
+          neighborCount += 1;
+        }
+        if(currentGeneration[b][j]==1){ // Bottom center
+          neighborCount += 1;
+        }
+        if(currentGeneration[b][d]==1){ // Bottom right
+          neighborCount += 1;
+        }
+
+        // Add total live nieghbors to neighborCountMap
+        neighborCountMap[i][j] = neighborCount;
+      }
+    }
+
+    return neighborCountMap;
   }
 
 
